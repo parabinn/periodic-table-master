@@ -1,0 +1,22 @@
+# (선택) Firebase Hosting 배포 — Actions 탭에서 'Run workflow'로 실행
+# 필요: 저장소 Settings → Secrets → FIREBASE_SERVICE_ACCOUNT (Firebase 서비스 계정 JSON)
+#       그리고 .firebaserc의 프로젝트 ID
+name: Deploy to Firebase Hosting
+on:
+  workflow_dispatch:   # 서비스 계정 키(FIREBASE_SERVICE_ACCOUNT)를 넣은 뒤 Actions 탭에서 수동 실행
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          channelId: live
